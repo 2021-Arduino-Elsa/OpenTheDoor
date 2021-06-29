@@ -24,7 +24,11 @@ int main(void)
 	VideoCapture capture;
 	Mat frame;
 	char buffer;
-	if (!serialComm.connect("COM159")) //COM25번의 포트를 오픈한다. 실패할 경우 -1을 반환한다.
+	char* str = new char[5];
+	for (int i = 0; i < 4; i++)
+		str[i] = "COM3"[i];
+	str[4] = '\0';
+	if (!serialComm.connect(str)) //COM25번의 포트를 오픈한다. 실패할 경우 -1을 반환한다.
 	{
 		cout << "connect faliled" << endl;
 		return -1;
@@ -35,7 +39,7 @@ int main(void)
 	if (!face_cascade.load(face_cascade_name)) { printf("--(!)Error loading face cascade\n"); return -1; };
 	if (!eyes_cascade.load(eyes_cascade_name)) { printf("--(!)Error loading eyes cascade\n"); return -1; };
 	//-- 2. Read the video stream
-	capture.open(-1);
+	capture.open(0);
 	if (!capture.isOpened()) { printf("--(!)Error opening video capture\n"); return -1; }
 	while (capture.read(frame))
 	{
@@ -65,7 +69,7 @@ void detectAndDisplay(Mat frame)
 
 		detectStatus = '1';
 		if (temp == '0') {
-			cout << "detect!!" << endl;
+			cout << "문이 열렸습니다." << endl;
 			serialComm.sendCommand('1');
 			temp = '1';
 		}
@@ -73,7 +77,7 @@ void detectAndDisplay(Mat frame)
 	else {
 		detectStatus = '0';
 		if (temp == '1') {
-			cout << "Unknown" << endl;
+			cout << "문이 닫혔습니다." << endl;
 			serialComm.sendCommand('0');
 			temp = '0';
 		}
